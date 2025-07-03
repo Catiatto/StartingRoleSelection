@@ -40,8 +40,8 @@ namespace StartingRoleSelection
         public string SelectCommand { get; set; } = Select._command;
         public string SelectDescription { get; set; } = Select._description;
         public string[] SelectAliases { get; set; } = Select._aliases;
-        public string SelectAddSuccess { get; set; } = "You have selected starting role %role% for %playernick%.";
-        public string SelectRemoveSuccess { get; set; } = "You have removed starting role %role% for %playernick%.";
+        public string SelectAddSuccess { get; set; } = "You have selected starting role %rolename% for %playernick%.";
+        public string SelectRemoveSuccess { get; set; } = "You have removed starting role %rolename% for %playernick%.";
         public string SelectRemoveFail { get; set; } = "Player %playernick% doesn't have any starting role.";
 
         [Description("Toggle command.")]
@@ -63,7 +63,7 @@ namespace StartingRoleSelection
         public string Usage { get; set; } = "Usage";
 
         [Description("Translation of other command responses.")]
-        public string AllSlotsTaken { get; set; } = "All available slots for this role (%rolename%) are already taken.";
+        public string AllSlotsTaken { get; set; } = "All available slots for the team %teamname% are already taken.";
         public string AlreadySelected { get; set; } = "Provided player has already chosen this role.";
         public string BlacklistedRole { get; set; } = "You can't choose a blacklisted role.";
         public string DedicatedServer { get; set; } = "You can't use this command on Dedicated Server.";
@@ -79,7 +79,7 @@ namespace StartingRoleSelection
         public string SecondMustBeRole { get; set; } = "Second argument must be a role name.";
         public string SenderNull { get; set; } = "Command sender is null.";
         public string ToggledOff { get; set; } = "Choosing roles is currently disabled.";
-        public string TeamLimitReached { get; set; } = "The team limit for this role (%rolename%) has been already reached.";
+        public string TeamLimitReached { get; set; } = "The team limit of this role (%rolename%) has been already reached.";
         public string TooMuchLeft { get; set; } = "Your starting role %rolename% was removed, because too many people left.";
 
         internal static Translation AccessTranslation()

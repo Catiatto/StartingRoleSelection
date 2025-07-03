@@ -20,8 +20,8 @@ namespace StartingRoleSelection
             RoleTypeId.Scp079
         };
 
-        [Description("Team limits of starting roles to choose per round.")]
-        public Dictionary<Team, int> TeamLimits { get; set; } = new()
+        [Description("Slot limit per team.")]
+        public Dictionary<Team, int> SlotLimit { get; set; } = new()
         {
             { Team.ClassD, 4},
             { Team.Scientists, 3},

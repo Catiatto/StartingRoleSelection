@@ -20,7 +20,7 @@ namespace StartingRoleSelection.Commands
             Command = translation.SelectSelfCommand ?? _command;
             Description = translation.SelectSelfDescription;
             Aliases = translation.SelectSelfAliases;
-            Usage = new[] { "%role%" };
+            Usage = new[] { "%role% or ID" };
             Log.Debug($"Registered {this.Command} command.", translation.Debug);
         }
 

@@ -102,7 +102,7 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             {
                 if (EventHandler.roleSelectPlayers.Remove(player))
                 {
-                    response = translation.SelectRemoveSuccess.Replace("%role%", role.ToString()).Replace("%playernick%", player.Nickname);
+                    response = translation.SelectRemoveSuccess.Replace("%rolename%", role.ToString()).Replace("%playernick%", player.Nickname);
                     return true;
                 }
                 response = translation.SelectRemoveFail.Replace("%playernick%", player.Nickname);
@@ -134,22 +134,22 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
                 return false;
             }
             int takenSlots = EventHandler.roleSelectPlayers.Count(p => p.Key != player && p.Value.GetTeam() == roleTeam);
-            if (Config.TeamLimits.TryGetValue(roleTeam, out int teamLimit) && takenSlots >= teamLimit)
+            if (Config.SlotLimit.TryGetValue(roleTeam, out int slotLimit) && takenSlots >= slotLimit)
+            {
+                response = translation.AllSlotsTaken.Replace("%teamname%", roleTeam.ToString());
+                Log.Debug($"Player {commandsender.Nickname} can't choose role {role} as all slots are already taken.", Config.Debug);
+                return false;
+            }
+            string spawnQueue = ConfigFile.ServerConfig.GetString("team_respawn_queue", RoleAssigner.DefaultQueue);
+            char teamEnum = char.Parse(((byte)roleTeam).ToString());
+            int teamLimit = spawnQueue.Remove(Player.Count).Count(t => t == teamEnum);
+            if (takenSlots >= teamLimit)
             {
                 response = translation.TeamLimitReached.Replace("%rolename%", role.ToString());
                 Log.Debug($"Player {commandsender.Nickname} can't choose a role as the team limit has been already reached.", Config.Debug);
                 return false;
             }
-            string spawnQueue = ConfigFile.ServerConfig.GetString("team_respawn_queue", RoleAssigner.DefaultQueue);
-            char teamEnum = char.Parse(((byte)roleTeam).ToString());
-            int availableRole = spawnQueue.Remove(Player.Count).Count(t => t == teamEnum);
-            if (takenSlots >= availableRole)
-            {
-                response = translation.AllSlotsTaken.Replace("%rolename%", role.ToString());
-                Log.Debug($"Player {commandsender.Nickname} can't choose role {role} as all slots are already taken.", Config.Debug);
-                return false;
-            }
-            if (role == RoleTypeId.Scp079 && availableRole == 1)
+            if (role == RoleTypeId.Scp079 && teamLimit == 1)
             {
                 response = translation.NoAlone079;
                 Log.Debug($"Player {commandsender.Nickname} can't choose SCP-079 as there is either not enough SCP slots.", Config.Debug);
@@ -163,7 +163,7 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             {
                 EventHandler.roleSelectPlayers[player] = role;
             }
-            response = translation.SelectAddSuccess.Replace("%role%", role.ToString()).Replace("%playernick%", player.Nickname);
+            response = translation.SelectAddSuccess.Replace("%rolename%", role.ToString()).Replace("%playernick%", player.Nickname);
             Log.Debug($"Player {commandsender.Nickname} has chosen role {role} for player {player.Nickname}.", Config.Debug);
             return true;
         }
