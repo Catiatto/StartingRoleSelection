@@ -3,10 +3,12 @@ Plugin for the "SCP: Secret Laboratory" game, that allows players to choose a st
 
 ## Features
 - Players can choose the starting role for themselves or other players (requires RA access), depending on permission.
+- Player can choose a role either by typing role full name, short name or byte.
 - Certain roles can be blacklisted from choosing.
 - Slot limit per team can be set.
 - Selecting roles can be toggled on and off. 
 - No more than half people on the server in any moment can have the starting role selected.
+- Players with SCP opt-out can't have chosen any SCP role.
 
 ## Installation
 Place *StartingRoleSelection* dll in "...\AppData\Roaming\SCP Secret Laboratory\LabAPI-Beta\plugins\global OR port_number".
@@ -24,6 +26,9 @@ The translation file is in the same folder as the config file and allows you to 
 - command name, aliases, descripton and responses
 
 *IMPORTANT:* If you translate command names and/or aliases (except subcommands), make sure not to duplicate them.
+
+## Available roles
+Any role can be selected by their byte. Short names are numbers for SCP roles (f.e. 096, 173) and nicknames for human classes (dboy, nerd, guard). 
 
 ## Remote Admin Commands
 ### startingroleselection
