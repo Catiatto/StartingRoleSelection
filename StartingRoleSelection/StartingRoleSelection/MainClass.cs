@@ -43,8 +43,8 @@ namespace StartingRoleSelection
 
         public override string Name { get; } = "StartingRoleSelection";
         public override string Description { get; } = null;
-        public override string Author { get; } = "Phineapple18";
-        public override Version Version { get; } = new(1, 0, 0);
+        public override string Author { get; } = "Catiatto";
+        public override Version Version { get; } = new(1, 1, 0);
         public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
     }
 }

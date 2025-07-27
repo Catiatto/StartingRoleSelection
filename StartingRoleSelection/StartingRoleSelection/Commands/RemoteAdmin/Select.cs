@@ -61,6 +61,11 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
                 Log.Debug($"Player {sender.LogName} doesn't have the permission to use this command with toggle off.", Config.Debug);
                 return false;
             }
+            if (arguments.Count > 0 && arguments.Contains("help"))
+            {
+                response = $"{translation.SelectHelp}:\n- " + string.Join("\n- ", spawnableRoles.Select(r => $"{((byte)r.Value)}, {r.Key} or {r.Value}"));
+                return true;
+            }
             if (arguments.Count < 2)
             {
                 response = $"{Description} {translation.Usage}: {this.DisplayCommandUsage()}";
@@ -69,7 +74,7 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             }
             if (!int.TryParse(arguments.At(0), out int id))
             {
-                response = translation.FirstMustBeNumber;
+                response = translation.MustBeNumber;
                 Log.Debug($"Player {sender.LogName} didn't provide any player ID.", Config.Debug);
                 return false;
             }
@@ -83,19 +88,19 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             if (player.IsHost)
             {
                 response = translation.DedicatedServer;
-                Log.Debug($"Player {player.Nickname} tried to use this command on dedicated server.", Config.Debug);
+                Log.Debug($"Player {commandsender.Nickname} tried to use this command on dedicated server.", Config.Debug);
                 return false;
             }
             if (player.IsOverwatchEnabled)
             {
-                response = translation.OverwatchEnabled;
-                Log.Debug($"Player {player.Nickname} has overwatch enabled.", Config.Debug);
+                response = translation.OverwatchEnabled.Replace("%playernick%", player.Nickname);
+                Log.Debug($"Player {commandsender.Nickname} can't choose a role for player {player.Nickname} because they have overwatch enabled.", Config.Debug);
                 return false;
             }
-            if (!Enum.TryParse(arguments.At(1), true, out RoleTypeId role))
+            if (!(spawnableRoles.TryGetValue(arguments.At(1), out RoleTypeId role) || Enum.TryParse(arguments.At(1), true, out role)))
             {
-                response = translation.SecondMustBeRole;
-                Log.Debug($"Player {commandsender.Nickname} didn't provide any role name.", Config.Debug);
+                response = translation.InvalidRole.Replace("%rolename%", arguments.At(1));
+                Log.Debug($"Player {commandsender.Nickname} provided invalid role name or ID.", Config.Debug);
                 return false;
             }
             if (role == RoleTypeId.None)
@@ -108,7 +113,7 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
                 response = translation.SelectRemoveFail.Replace("%playernick%", player.Nickname);
                 return false;
             }
-            if (!spawnableRoles.Contains(role))
+            if (!spawnableRoles.Values.Contains(role))
             {
                 response = translation.MustBeStarting.Replace("%rolename%", role.ToString());
                 Log.Debug($"Player {commandsender.Nickname} can't select non-starting role {role}.", Config.Debug);
@@ -123,21 +128,27 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             if (EventHandler.roleSelectPlayers.TryGetValue(player, out RoleTypeId chosenRole) && chosenRole == role)
             {
                 response = translation.AlreadySelected;
-                Log.Debug($"Player {commandsender.Nickname} already selected this role ({role}).", Config.Debug);
+                Log.Debug($"Player {commandsender.Nickname} already selected role {role} for player {player.Nickname}.", Config.Debug);
+                return false;
+            }
+            if (EventHandler.roleSelectPlayers.Count(p => p.Key != player) > Player.Count / 2 && !commandsender.HasPermissions("srs.override"))
+            {
+                response = translation.TooManyChose.Replace("%rolename%", role.ToString());
+                Log.Debug($"Player {commandsender.Nickname} can't choose a role as too many people have already chosen a role.", Config.Debug);
                 return false;
             }
             Team roleTeam = role.GetTeam();
-            if (EventHandler.roleSelectPlayers.Count(p => p.Key != player) >= Player.Count / 2)
+            if (roleTeam == Team.SCPs && ScpPlayerPicker.IsOptedOutOfScp(player.ReferenceHub))
             {
-                response = translation.NotEnoughPlayers.Replace("%rolename%", role.ToString());
-                Log.Debug($"Player {commandsender.Nickname} can't choose a role as there is not enough players.", Config.Debug);
+                response = translation.ScpOptOut.Replace("%playernick%", player.Nickname);
+                Log.Debug($"Player {commandsender.Nickname} can't choose a role {role} for player {player.Nickname} as they opted out of SCP.", Config.Debug);
                 return false;
             }
             int takenSlots = EventHandler.roleSelectPlayers.Count(p => p.Key != player && p.Value.GetTeam() == roleTeam);
             if (Config.SlotLimit.TryGetValue(roleTeam, out int slotLimit) && takenSlots >= slotLimit)
             {
                 response = translation.AllSlotsTaken.Replace("%teamname%", roleTeam.ToString());
-                Log.Debug($"Player {commandsender.Nickname} can't choose role {role} as all slots are already taken.", Config.Debug);
+                Log.Debug($"Player {commandsender.Nickname} can't choose role {role} for player {player.Nickname} as all slots are already taken.", Config.Debug);
                 return false;
             }
             string spawnQueue = ConfigFile.ServerConfig.GetString("team_respawn_queue", RoleAssigner.DefaultQueue);
@@ -146,13 +157,13 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             if (takenSlots >= teamLimit)
             {
                 response = translation.TeamLimitReached.Replace("%rolename%", role.ToString());
-                Log.Debug($"Player {commandsender.Nickname} can't choose a role as the team limit has been already reached.", Config.Debug);
+                Log.Debug($"Player {commandsender.Nickname} can't choose a role {role} for player {player.Nickname} as the team limit has been already reached.", Config.Debug);
                 return false;
             }
             if (role == RoleTypeId.Scp079 && teamLimit == 1)
             {
                 response = translation.NoAlone079;
-                Log.Debug($"Player {commandsender.Nickname} can't choose SCP-079 as there is either not enough SCP slots.", Config.Debug);
+                Log.Debug($"Player {commandsender.Nickname} can't choose SCP-079 for player {player.Nickname} as there is either not enough SCP slots.", Config.Debug);
                 return false;
             }
             try
@@ -168,22 +179,23 @@ namespace StartingRoleSelection.Commands.RemoteAdmin
             return true;
         }
 
-        private readonly List<RoleTypeId> spawnableRoles = new()
+        public readonly Dictionary<string, RoleTypeId> spawnableRoles = new()
         {
-            RoleTypeId.ClassD,
-            RoleTypeId.FacilityGuard,
-            RoleTypeId.Scientist,
-            RoleTypeId.Scp049,
-            RoleTypeId.Scp079,
-            RoleTypeId.Scp096,
-            RoleTypeId.Scp106,
-            RoleTypeId.Scp173,
-            RoleTypeId.Scp3114,
-            RoleTypeId.Scp939
+            { "dboy", RoleTypeId.ClassD },
+            { "guard", RoleTypeId.FacilityGuard },
+            { "nerd", RoleTypeId.Scientist },
+            { "049", RoleTypeId.Scp049 },
+            { "079", RoleTypeId.Scp079 },
+            { "096", RoleTypeId.Scp096 },
+            { "106", RoleTypeId.Scp106 },
+            { "173", RoleTypeId.Scp173 },
+            { "3114", RoleTypeId.Scp3114 },
+            { "939", RoleTypeId.Scp939 }
         };
 
+
         internal const string _command = "select";
-        internal const string _description = "Select player's starting role. Use \"None\" if you want to remove a previously chosen role.";
+        internal const string _description = "Select player's starting role. Use \"None\" if you want to remove a previously chosen role. Use \"help\" to display role names.";
         internal static readonly string[] _aliases = new[] { "s" };
         private readonly Translation translation;
 

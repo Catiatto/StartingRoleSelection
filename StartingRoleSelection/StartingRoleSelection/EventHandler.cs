@@ -64,7 +64,7 @@ namespace StartingRoleSelection
             {
                 Dictionary<Player, RoleTypeId> initialRoles = Player.ReadyList.Zip(Player.ReadyList.Select(p => p.Role), (key, value) => new {key, value})
                                                               .ToDictionary(entry => entry.key, entry => entry.value);
-                Dictionary<Player, RoleTypeId> finalRoles = initialRoles;
+                Dictionary<Player, RoleTypeId> finalRoles = initialRoles.ToDictionary(entry => entry.Key, entry => entry.Value);
                 List<Player> normalPlayers = Player.ReadyList.ToList();
                 Log.Debug($"Initial player roles:\n- {string.Join("\n- ", initialRoles.Select(entry => $"{entry.Key.Nickname}: {entry.Value}"))}", config.Debug);
                 roleSelectPlayers.ForEach(entry =>
@@ -79,7 +79,12 @@ namespace StartingRoleSelection
                         Log.Debug($"Player {player.Nickname} ({oldRole}) was granted role {newRole}.", config.Debug);
                         return;
                     }
-                    IEnumerable<Player> exchangePlayers = normalPlayers.Where(p => p.Team == newRole.GetTeam());
+                    List<Player> exchangePlayers = normalPlayers.Where(p => p.Team == newRole.GetTeam()).ToList();
+                    if (oldRole.GetTeam() == Team.SCPs && exchangePlayers.Count() - exchangePlayers.Count(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub)) > 0)
+                    {
+                        int scpOptOut = exchangePlayers.RemoveAll(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub));
+                        Log.Debug($"Removed {scpOptOut} players with SCP opt-out.", config.Debug);
+                    }
                     if (exchangePlayers.IsEmpty())
                     {
                         player.SendBroadcast(translation.NoReplacements.Replace("%rolename%", newRole.ToString()), 5);
@@ -93,7 +98,13 @@ namespace StartingRoleSelection
                     normalPlayers.Remove(player);
                     Log.Debug($"Player {player.Nickname} ({oldRole}) was granted role {newRole} in exchange with player {replacement.Nickname} ({oldRoleReplacement}).", config.Debug);
                 });
-                finalRoles.ForEach(entry => entry.Key.SetRole(entry.Value, RoleChangeReason.RoundStart));
+                finalRoles.ForEach(entry =>
+                {
+                    if (entry.Value != initialRoles[entry.Key])
+                    {
+                        entry.Key.SetRole(entry.Value, RoleChangeReason.RoundStart);
+                    }
+                });
                 roleSelectPlayers.Clear();
                 Log.Debug($"Final player roles:\n- {string.Join("\n- ", finalRoles.Select(entry => $"{entry.Key.Nickname}: {entry.Value}"))}", config.Debug);
             });

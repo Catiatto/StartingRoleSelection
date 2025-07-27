@@ -19,6 +19,7 @@ namespace StartingRoleSelection
         [Description("MISCELLANOUS TRANSLATION. Don't translate words put between two '%'.")]
         public string OverwatchRole { get; set; } = "Your starting role was removed due to changing to Overwatch role.";
         public string NoReplacements { get; set; } = "Your role %rolename% couldn't be granted, because there is nobody to exchange roles.";
+        public string TooMuchLeft { get; set; } = "Your starting role %rolename% was removed, because too many people left.";
 
         [Description("COMMANDS\' TRANSLATION. Don't translate words put between two '%'." +
                      "\n# Should debug be enabled for command registering?")]
@@ -43,6 +44,7 @@ namespace StartingRoleSelection
         public string SelectAddSuccess { get; set; } = "You have selected starting role %rolename% for %playernick%.";
         public string SelectRemoveSuccess { get; set; } = "You have removed starting role %rolename% for %playernick%.";
         public string SelectRemoveFail { get; set; } = "Player %playernick% doesn't have any starting role.";
+        public string SelectHelp { get; set; } = "Spawnable roles";
 
         [Description("Toggle command.")]
         public string ToggleCommand { get; set; } = Toggle._command;
@@ -64,23 +66,23 @@ namespace StartingRoleSelection
 
         [Description("Translation of other command responses.")]
         public string AllSlotsTaken { get; set; } = "All available slots for the team %teamname% are already taken.";
-        public string AlreadySelected { get; set; } = "Provided player has already chosen this role.";
+        public string AlreadySelected { get; set; } = "You have already chosen this role.";
         public string BlacklistedRole { get; set; } = "You can't choose a blacklisted role.";
         public string DedicatedServer { get; set; } = "You can't use this command on Dedicated Server.";
-        public string FirstMustBeNumber { get; set; } = "First argument must be a number.";
+        public string InvalidRole { get; set; } = "You provided invalid role %rolename%.";
+        public string MustBeNumber { get; set; } = "First argument must be a number.";
         public string MustBeStarting { get; set; } = "Provided role %rolename% is not a starting role.";
-        public string NoAlone079 { get; set; } = "You can't choose SCP-079 as there is not enough SCP slots.";
+        public string NoAlone079 { get; set; } = "You can't choose SCP-079 as there is not enough players.";
         public string NoPermission { get; set; } = "You don't have permission to use this feature.";
         public string NoPlayers { get; set; } = "Provided player(s) doesn't exist.";
-        public string NotEnoughPlayers { get; set; } = "There is not enough players to choose any role.";
-        public string OverwatchEnabled { get; set; } = "Provided player has overwatch enabled.";
+        public string OverwatchEnabled { get; set; } = "Provided player %playernick% has overwatch enabled.";
         public string PluginNotEnabled { get; set; } = "StartingRoleSelection is not enabled.";
         public string RoundStarted { get; set; } = "You can't use this feature after round start.";
-        public string SecondMustBeRole { get; set; } = "Second argument must be a role name.";
+        public string ScpOptOut { get; set; } = "Provided player %playernick% has opted out of SCP.";
         public string SenderNull { get; set; } = "Command sender is null.";
         public string ToggledOff { get; set; } = "Choosing roles is currently disabled.";
         public string TeamLimitReached { get; set; } = "The team limit of this role (%rolename%) has been already reached.";
-        public string TooMuchLeft { get; set; } = "Your starting role %rolename% was removed, because too many people left.";
+        public string TooManyChose { get; set; } = "Too many people have already chosen a starting role.";
 
         internal static Translation AccessTranslation()
         {
