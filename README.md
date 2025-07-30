@@ -28,7 +28,16 @@ The translation file is in the same folder as the config file and allows you to 
 *IMPORTANT:* If you translate command names and/or aliases (except subcommands), make sure not to duplicate them.
 
 ## Available roles
-Any role can be selected by their byte. Short names are numbers for SCP roles (f.e. 096, 173) and nicknames for human classes (dboy, nerd, guard). 
+- ClassD,dboy or 0
+- Scientist, nerd or 6
+- FacilityGuard, guard or 15
+- Scp049, 049 or 5
+- Scp079, 079 or 7
+- Scp096, 096 or 9
+- Scp106, 106 or 3
+- Scp173, 173 or 0
+- Scp939, 939 or 16
+- Scp3114, 3114 or 23
 
 ## Remote Admin Commands
 ### startingroleselection
