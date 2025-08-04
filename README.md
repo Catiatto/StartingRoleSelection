@@ -1,4 +1,4 @@
-# StartingRoleSelection (1.1.0)
+# StartingRoleSelection (1.1.1)
 Plugin for the "SCP: Secret Laboratory" game, that allows players to choose a starting role.
 
 ## Features
