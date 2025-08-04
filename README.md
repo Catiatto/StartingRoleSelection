@@ -28,7 +28,7 @@ The translation file is in the same folder as the config file and allows you to 
 *IMPORTANT:* If you translate command names and/or aliases (except subcommands), make sure not to duplicate them.
 
 ## Available roles
-- ClassD,dboy or 0
+- ClassD, dboy or 0
 - Scientist, nerd or 6
 - FacilityGuard, guard or 15
 - Scp049, 049 or 5
