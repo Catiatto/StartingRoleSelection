@@ -14,13 +14,13 @@ namespace StartingRoleSelection
         [Description("Should debug be enabled?")]
         public bool Debug { get; set; } = false;
 
-        [Description("Blacklisted starting roles that cannot be chosen by players without permission.")]
+        [Description("Blacklisted starting roles that cannot be selected by players without permission.")]
         public List<RoleTypeId> BlacklistedRoles { get; set; } = new List<RoleTypeId>
         {
             RoleTypeId.Scp079
         };
 
-        [Description("Slot limit per team.")]
+        [Description("How many players at once can have selected role from a certain team, regardless of player count?")]
         public Dictionary<Team, int> SlotLimit { get; set; } = new()
         {
             { Team.ClassD, 4},

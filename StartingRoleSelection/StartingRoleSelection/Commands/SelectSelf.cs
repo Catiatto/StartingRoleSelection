@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CommandSystem;
 using Log = LabApi.Features.Console.Logger;
+
+using CommandSystem;
 using RemoteAdmin;
 using StartingRoleSelection.Commands.RemoteAdmin;
 
@@ -16,7 +17,7 @@ namespace StartingRoleSelection.Commands
     {
         public SelectSelf()
         {
-            translation = Translation.AccessTranslation();
+            Translation translation = Translation.AccessTranslation();
             Command = translation.SelectSelfCommand ?? _command;
             Description = translation.SelectSelfDescription;
             Aliases = translation.SelectSelfAliases;
@@ -36,7 +37,6 @@ namespace StartingRoleSelection.Commands
         internal const string _command = "selectself";
         internal const string _description = "Select your starting role. Use \"None\" if you want to remove your previously chosen role.";
         internal static readonly string[] _aliases = new[] { "sels" };
-        private readonly Translation translation;
 
         public string Command { get; }
         public string Description { get; }

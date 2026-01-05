@@ -17,12 +17,12 @@ namespace StartingRoleSelection
         {
             pluginTranslation = this.LoadConfig<Translation>("translation.yml");
             base.LoadConfigs();
+            pluginConfig = Config;
         }
 
         public override void Enable()
         {
             Instance = this;
-            pluginConfig = Config;
             Events = new();
             CustomHandlersManager.RegisterEventsHandler(Events);
         }
@@ -44,7 +44,7 @@ namespace StartingRoleSelection
         public override string Name { get; } = "StartingRoleSelection";
         public override string Description { get; } = null;
         public override string Author { get; } = "Catiatto";
-        public override Version Version { get; } = new(1, 1, 1);
+        public override Version Version { get; } = new(1, 1, 2);
         public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
         public override bool IsTransparent { get; } = true;
     }

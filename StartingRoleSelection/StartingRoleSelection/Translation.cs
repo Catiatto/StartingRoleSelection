@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 
 using LabApi.Loader.Features.Paths;
+using LabApi.Features.Wrappers;
 using Serialization;
 using StartingRoleSelection.Commands;
 using StartingRoleSelection.Commands.RemoteAdmin;
@@ -81,7 +82,7 @@ namespace StartingRoleSelection
         public string ScpOptOut { get; set; } = "Provided player %playernick% has opted out of SCP.";
         public string SenderNull { get; set; } = "Command sender is null.";
         public string ToggledOff { get; set; } = "Choosing roles is currently disabled.";
-        public string TeamLimitReached { get; set; } = "The team limit of this role (%rolename%) has been already reached.";
+        public string TeamLimitReached { get; set; } = "The team limit (%teamname%) of this role (%rolename%) has been already reached.";
         public string TooManyChose { get; set; } = "Too many people have already chosen a starting role.";
 
         internal static Translation AccessTranslation()
@@ -91,6 +92,6 @@ namespace StartingRoleSelection
 
         private static Translation translation;
 
-        private static readonly string filePath = Path.Combine(PathManager.Configs.FullName, "StartingRoleSelection", "translation.yml");
+        private static readonly string filePath = Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), "StartingRoleSelection", "translation.yml");
     }
 }
