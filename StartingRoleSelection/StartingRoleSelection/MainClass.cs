@@ -44,8 +44,9 @@ namespace StartingRoleSelection
         public override string Name { get; } = "StartingRoleSelection";
         public override string Description { get; } = null;
         public override string Author { get; } = "Catiatto";
-        public override Version Version { get; } = new(1, 1, 2);
+        public override Version Version { get; } = new(1, 1, 3);
         public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
         public override bool IsTransparent { get; } = true;
     }
 }
+
