@@ -63,40 +63,41 @@ namespace StartingRoleSelection
             }
             Timing.CallDelayed(0.1f, delegate ()
             {
-                Dictionary<Player, RoleTypeId> initialRoles = Player.ReadyList.Zip(Player.ReadyList.Select(p => p.Role), (key, value) => new {key, value})
+                Dictionary<Player, RoleTypeId> initialRoles = Player.ReadyList.Zip(Player.ReadyList.Select(p => p.Role), (key, value) => new { key, value })
                                                               .ToDictionary(entry => entry.key, entry => entry.value);
                 Dictionary<Player, RoleTypeId> finalRoles = initialRoles.ToDictionary(entry => entry.Key, entry => entry.Value);
-                List<Player> normalPlayers = Player.ReadyList.ToList();
+                Dictionary<Player, RoleTypeId> allPlayers = initialRoles.ToDictionary(entry => entry.Key, entry => entry.Value);
                 Log.Debug($"Initial player roles:\n- {string.Join("\n- ", initialRoles.Select(entry => $"{entry.Key.Nickname}: {entry.Value}"))}", Config.Debug);
                 roleSelectPlayers.ForEach(entry =>
                 {
                     Player player = entry.Key;
-                    RoleTypeId oldRole = player.Role;
+                    RoleTypeId oldRole = allPlayers[player];
                     RoleTypeId newRole = entry.Value;
-                    if (oldRole == newRole || oldRole.GetTeam() == newRole.GetTeam() && !normalPlayers.Select(p => p.Role).Contains(newRole))
+                    if (oldRole == newRole || oldRole.GetTeam() == newRole.GetTeam() && !allPlayers.Select(p => p.Value).Contains(newRole))
                     {
                         finalRoles[player] = newRole;
-                        normalPlayers.Remove(player);
+                        allPlayers.Remove(player);
                         Log.Debug($"Player {player.Nickname} ({oldRole}) was granted role {newRole}.", Config.Debug);
                         return;
                     }
-                    List<Player> exchangePlayers = normalPlayers.Where(p => p.Team == newRole.GetTeam()).ToList();
-                    if (oldRole.GetTeam() == Team.SCPs && exchangePlayers.Count() - exchangePlayers.Count(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub)) > 0)
+                    List<Player> replacements = allPlayers.Where(p => p.Value.GetTeam() == newRole.GetTeam()).Select(p => p.Key).ToList();
+                    if (oldRole.GetTeam() == Team.SCPs && replacements.Count(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub)) > 0)
                     {
-                        int scpOptOut = exchangePlayers.RemoveAll(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub));
-                        Log.Debug($"Removed {scpOptOut} players with SCP opt-out.", Config.Debug);
+                        int scpOptOut = replacements.RemoveAll(p => ScpPlayerPicker.IsOptedOutOfScp(p.ReferenceHub));
+                        Log.Debug($"Removed {scpOptOut} player(s) with SCP opt-out.", Config.Debug);
                     }
-                    if (exchangePlayers.IsEmpty())
+                    if (replacements.IsEmpty())
                     {
                         player.SendBroadcast(Translation.NoReplacements.Replace("%rolename%", newRole.ToString()), 5);
                         Log.Debug($"Role {newRole} couldn't be granted to player {player.Nickname} due to no players to exhange role with.", Config.Debug);
                         return;
                     }
-                    Player replacement = exchangePlayers.Count(p => p.Role == newRole) == 1 ? exchangePlayers.Single(p => p.Role == newRole) : exchangePlayers.ElementAt(random.Next(exchangePlayers.Count()));
-                    RoleTypeId oldRoleReplacement = replacement.Role;
+                    Player replacement = replacements.Count(p => p.Role == newRole) == 1 ? replacements.Single(p => p.Role == newRole) : replacements.ElementAt(random.Next(replacements.Count()));
+                    RoleTypeId oldRoleReplacement = finalRoles[replacement];
                     finalRoles[player] = newRole;
                     finalRoles[replacement] = oldRole;
-                    normalPlayers.Remove(player);
+                    allPlayers[replacement] = oldRole;
+                    allPlayers.Remove(player);
                     Log.Debug($"Player {player.Nickname} ({oldRole}) was granted role {newRole} in exchange with player {replacement.Nickname} ({oldRoleReplacement}).", Config.Debug);
                 });
                 finalRoles.ForEach(entry =>
